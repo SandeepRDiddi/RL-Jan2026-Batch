@@ -20,7 +20,7 @@ from __future__ import annotations
 import math
 
 def bytes_to_human(n_bytes: int) -> str:
-    gib = n_bytes / (1024**3)
+    gib = n_bytes / (1024**3)``
     mib = n_bytes / (1024**2)
     kib = n_bytes / 1024
     if gib >= 1:

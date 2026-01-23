@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Training Pipeline & Alignment - Interactive Infographic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom, #020617, #0f172a, #020617);
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(to right, #06b6d4, #3b82f6, #a855f7);
+            width: 0%;
+            z-index: 999;
+            transition: width 0.1s ease-out;
+        }
+
+        /* Header Section */
+        .header {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 24px;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 80px;
+            left: 40px;
+            width: 288px;
+            height: 288px;
+            background: #3b82f6;
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            filter: blur(96px);
+            opacity: 0.2;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            width: 288px;
+            height: 288px;
+            background: #a855f7;
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            filter: blur(96px);
+            opacity: 0.2;
+            animation: pulse 4s ease-in-out infinite 1s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 56rem;
+        }
+
+        .header h1 {
+            font-size: 3.75rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(to right, #cffafe, #bfdbfe, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.5rem;
+            color: #cbd5e1;
+            margin-bottom: 32px;
+        }
+
+        .header-badge {
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 12px;
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(8px);
+            font-size: 1.125rem;
+            color: #f1f5f9;
+        }
+
+        /* Section Styling */
+        section {
+            padding: 96px 24px;
+        }
+
+        section.dark-bg {
+            background: rgba(30, 41, 59, 0.3);
+        }
+
+        .container {
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+
+        /* Headings */
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 64px;
+            text-align: center;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2.red-gradient {
+            background: linear-gradient(135deg, #fca5a5, #fed7aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2.green-gradient {
+            background: linear-gradient(135deg, #86efac, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2.yellow-gradient {
+            background: linear-gradient(135deg, #fcd34d, #fed7aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h3 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #06b6d4;
+        }
+
+        h3.red { color: #f87171; }
+        h3.green { color: #4ade80; }
+        h3.teal { color: #2dd4bf; }
+
+        /* Case Study Box */
+        .case-study {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 64px;
+            backdrop-filter: blur(8px);
+        }
+
+        .case-study p {
+            font-size: 1.125rem;
+            margin-bottom: 16px;
+        }
+
+        .case-study span {
+            color: #06b6d4;
+            font-weight: 600;
+        }
+
+        /* Stage Grid */
+        .stage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .stage-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px rgba(100, 116, 139, 0.3);
+            border: 1px solid;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .stage-card.blue {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(55, 65, 181, 0.1));
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .stage-card.purple {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(126, 34, 206, 0.1));
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .stage-card.pink {
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(219, 39, 119, 0.1));
+            border-color: rgba(244, 63, 94, 0.3);
+        }
+
+        .stage-card h4 {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #06b6d4;
+        }
+
+        .stage-card.purple h4 { color: #d8b4fe; }
+        .stage-card.pink h4 { color: #f472b6; }
+
+        .stage-card p {
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 32px;
+        }
+
+        thead {
+            background: rgba(51, 65, 85, 0.5);
+        }
+
+        th {
+            border: 1px solid #334155;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #06b6d4;
+        }
+
+        td {
+            border: 1px solid #475569;
+            padding: 16px;
+            font-size: 0.875rem;
+        }
+
+        tbody tr:hover {
+            background: rgba(51, 65, 85, 0.2);
+            transition: background 0.2s;
+        }
+
+        /* Challenge Section */
+        .challenge-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .challenge-btn {
+            padding: 16px;
+            border-radius: 8px;
+            border: 2px solid;
+            background: rgba(30, 41, 59, 0.2);
+            color: #cbd5e1;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-color: #475569;
+        }
+
+        .challenge-btn:hover {
+            border-color: #64748b;
+            background: rgba(51, 65, 85, 0.3);
+        }
+
+        .challenge-btn.active {
+            border-color: #f87171;
+            background: rgba(248, 113, 113, 0.2);
+            color: #fca5a5;
+        }
+
+        /* Challenge Content */
+        .challenge-content {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.6));
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-radius: 16px;
+            padding: 48px;
+            backdrop-filter: blur(20px);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .challenge-content h3 {
+            color: #f87171;
+            margin-bottom: 24px;
+        }
+
+        .problem-box, .example-box {
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            border-left: 4px solid;
+        }
+
+        .problem-box {
+            background: rgba(127, 29, 29, 0.2);
+            border-left-color: #dc2626;
+        }
+
+        .problem-box p:first-child {
+            font-weight: 600;
+            color: #fca5a5;
+            margin-bottom: 8px;
+        }
+
+        .example-box {
+            background: rgba(120, 53, 15, 0.2);
+            border-left-color: #ea580c;
+        }
+
+        .example-box p:first-child {
+            font-weight: 600;
+            color: #fed7aa;
+            margin-bottom: 8px;
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .solution-item {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 8px;
+        }
+
+        .solution-icon {
+            color: #4ade80;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .solution-item p {
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        /* Medical Example Grid */
+        .medical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .medical-card {
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #475569;
+        }
+
+        .medical-card.blue {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(55, 65, 181, 0.1));
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .medical-card.purple {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(126, 34, 206, 0.1));
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .medical-card.green {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1));
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .medical-card h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #06b6d4;
+        }
+
+        .medical-card.purple h4 { color: #d8b4fe; }
+        .medical-card.green h4 { color: #6ee7b7; }
+
+        .card-section {
+            margin-bottom: 16px;
+        }
+
+        .card-section p:first-child {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .card-section p:last-child {
+            font-size: 0.875rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .card-section.correct p:first-child { color: #86efac; }
+        .card-section.gap p:first-child { color: #fca5a5; }
+
+        /* Equations Section */
+        .equations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+
+        .equation-card {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .equation-card h3 {
+            font-size: 1.125rem;
+            margin-bottom: 16px;
+            color: #06b6d4;
+        }
+
+        .equation-box {
+            background: #020617;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid #475569;
+        }
+
+        .equation-box code {
+            font-family: 'Space Mono', monospace;
+            color: #d8b4fe;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .equation-card p {
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* Alignment Section */
+        .alignment-pillars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .pillar {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(45, 212, 191, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .pillar-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .pillar h5 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2dd4bf;
+            margin-bottom: 12px;
+        }
+
+        .pillar p {
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .pillar-metric {
+            background: rgba(45, 212, 191, 0.2);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #a5f3fc;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Takeaways Grid */
+        .takeaways-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .takeaway-box {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .takeaway-box.blue-accent {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .takeaway-box.green-accent {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .takeaway-box h3 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+        }
+
+        .takeaway-box.blue-accent h3 { color: #60a5fa; }
+        .takeaway-box.green-accent h3 { color: #4ade80; }
+
+        .takeaway-list {
+            list-style: none;
+        }
+
+        .takeaway-list li {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .takeaway-list li span:first-child {
+            font-weight: bold;
+            color: #60a5fa;
+            flex-shrink: 0;
+        }
+
+        .takeaway-box.green-accent .takeaway-list li span:first-child {
+            color: #4ade80;
+        }
+
+        /* Bottom Line */
+        .bottom-line {
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.15), rgba(37, 99, 235, 0.15));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 16px;
+            padding: 48px;
+        }
+
+        .bottom-line h3 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            margin-bottom: 32px;
+            color: #d8b4fe;
+        }
+
+        .bottom-line p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #f1f5f9;
+        }
+
+        .bottom-line span.blue { color: #60a5fa; font-weight: 600; }
+        .bottom-line span.purple { color: #d8b4fe; font-weight: 600; }
+        .bottom-line span.green { color: #4ade80; font-weight: 600; }
+
+        /* Footer */
+        .footer {
+            padding: 64px 24px;
+            border-top: 1px solid #475569;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        .footer p {
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            font-size: 0.875rem;
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.25rem;
+            }
+
+            .header p {
+                font-size: 1.125rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+                margin-bottom: 32px;
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            section {
+                padding: 48px 20px;
+            }
+
+            .challenge-content {
+                padding: 24px;
+            }
+
+            .bottom-line {
+                padding: 24px;
+            }
+
+            .bottom-line h3 {
+                font-size: 1.25rem;
+            }
+
+            .bottom-line p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar"></div>
+
+    <!-- Header -->
+    <section class="header">
+        <div class="header-content">
+            <h1>LLM Training Pipeline & Alignment</h1>
+            <p>Complete Integration, Challenges & Pharmaceutical Applications</p>
+            <div class="header-badge">From Statistical Foundation to Clinical Excellence</div>
+        </div>
+    </section>
+
+    <!-- Section 1: Pipeline Integration -->
+    <section>
+        <div class="container">
+            <h2>8. Complete Pipeline Integration</h2>
+
+            <div class="case-study">
+                <h3>8.1 Real-World Case: Adverse Event Discovery</h3>
+                <p><span>Researcher Query:</span> "Drug-induced liver injury in patients with chronic kidney disease on statins"</p>
+                <div class="stage-grid">
+                    <div class="stage-card blue">
+                        <h4>Stage 1: Pretraining</h4>
+                        <p>Model learned correlation between CKD + statin + elevated liver enzymes from internet text patterns</p>
+                    </div>
+                    <div class="stage-card purple">
+                        <h4>Stage 2: SFT</h4>
+                        <p>Learned to structure queries following FAIR principles (Findable, Accessible, Interoperable, Reusable)</p>
+                    </div>
+                    <div class="stage-card pink">
+                        <h4>Stage 3: RLHF</h4>
+                        <p>Ranked search results by expert preference for clinical relevance + data quality</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>8.2 Integration Table: All Three Stages Combined</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Objective</th>
+                            <th>Key Loss Function</th>
+                            <th>Data Size</th>
+                            <th>Output Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="color: #60a5fa; font-weight: 600;">Pretraining</td>
+                            <td>Learn general language + domain patterns</td>
+                            <td style="font-family: 'Space Mono', monospace;">-Σ log P(w_t|context)</td>
+                            <td>Billions of tokens</td>
+                            <td style="color: #fbbf24;">Broad but misaligned</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #d8b4fe; font-weight: 600;">SFT</td>
+                            <td>Teach instruction-following + structure</td>
+                            <td style="font-family: 'Space Mono', monospace;">-log π_sft(expert_resp)</td>
+                            <td>10k-100k pairs</td>
+                            <td style="color: #fbbf24;">Good but capped</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #f472b6; font-weight: 600;">RLHF</td>
+                            <td>Align with expert preferences</td>
+                            <td style="font-family: 'Space Mono', monospace;">max reward - βKL</td>
+                            <td>5k-50k prefs</td>
+                            <td style="color: #4ade80;">Excellent & aligned</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Challenges -->
+    <section class="dark-bg">
+        <div class="container">
+            <h2 class="red-gradient">9. Challenges in LLM Training & Solutions</h2>
+
+            <div class="challenge-buttons">
+                <button class="challenge-btn active" onclick="showChallenge(0)">⚠️ Annotation Quality</button>
+                <button class="challenge-btn" onclick="showChallenge(1)">⚠️ Reward Hacking</button>
+                <button class="challenge-btn" onclick="showChallenge(2)">⚠️ Distribution Shift</button>
+                <button class="challenge-btn" onclick="showChallenge(3)">⚠️ Data Scalability</button>
+            </div>
+
+            <div class="challenge-content" id="challenge-0">
+                <h3>Annotation Quality & Inconsistency</h3>
+                <div class="problem-box">
+                    <p>Problem:</p>
+                    <p>Different experts prioritize different aspects</p>
+                </div>
+                <div class="example-box">
+                    <p>Example:</p>
+                    <p>Annotator A: Specific eGFR cutoffs (safety) vs Annotator B: Alternative drugs (flexibility)</p>
+                </div>
+                <p style="font-weight: 600; color: #4ade80; margin-bottom: 16px;">Solutions:</p>
+                <div class="solutions-grid">
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Inter-Rater Reliability (Fleiss' Kappa ≥ 0.60)</p>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Multi-Annotator Consensus (2/3 agreement)</p>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Calibration Sessions with explicit guidelines</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="challenge-content" id="challenge-1" style="display: none;">
+                <h3>Reward Hacking</h3>
+                <div class="problem-box">
+                    <p>Problem:</p>
+                    <p>Reward Model exploited rather than genuinely improved</p>
+                </div>
+                <div class="example-box">
+                    <p>Example:</p>
+                    <p>If RM rewards length: Model generates verbose, repetitive text to maximize length</p>
+                </div>
+                <p style="font-weight: 600; color: #4ade80; margin-bottom: 16px;">Solutions:</p>
+                <div class="solutions-grid">
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Human Validation of PPO-generated outputs</p>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>KL Regularization (higher β = stay closer to SFT)</p>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Ensemble RMs to reduce single model biases</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="challenge-content" id="challenge-2" style="display: none;">
+                <h3>Distribution Shift</h3>
+                <div class="problem-box">
+                    <p>Problem:</p>
+                    <p>RM trained on SFT data; PPO produces increasingly different outputs</p>
+                </div>
+                <div class="example-box">
+                    <p>Example:</p>
+                    <p>Out-of-distribution samples have unreliable RM scores</p>
+                </div>
+                <p style="font-weight: 600; color: #4ade80; margin-bottom: 16px;">Solutions:</p>
+                <div class="solutions-grid">
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Active Learning on PPO-generated samples</p>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Iterative Refinement cycles (RM → PPO → RM)</p>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Continuous retraining on newer distributions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="challenge-content" id="challenge-3" style="display: none;">
+                <h3>Scalability of Human Preference Data</h3>
+                <div class="problem-box">
+                    <p>Problem:</p>
+                    <p>Expert time is expensive; collecting 50k pairs is costly</p>
+                </div>
+                <div class="example-box">
+                    <p>Example:</p>
+                    <p>Pharmacist expertise is limited resource</p>
+                </div>
+                <p style="font-weight: 600; color: #4ade80; margin-bottom: 16px;">Solutions:</p>
+                <div class="solutions-grid">
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Focus on High-Value Data (diverse, challenging examples)</p>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Unlabeled Data Ranking with uncertainty sampling</p>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-icon">✓</div>
+                        <p>Crowdsourcing with Expert spot-checks</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Medical Example -->
+    <section>
+        <div class="container">
+            <h2 class="green-gradient">10. Why All Three Stages Matter: Medical Example</h2>
+
+            <div class="case-study">
+                <h3 style="color: #2dd4bf;">Case: Adverse Drug Interaction Detection</h3>
+                <p><span>Query:</span> "Patient on warfarin + ibuprofen. Risk assessment?"</p>
+            </div>
+
+            <div class="medical-grid">
+                <div class="medical-card blue">
+                    <h4>Pretraining</h4>
+                    <div class="card-section">
+                        <p>Output:</p>
+                        <p>"...warfarin ibuprofen bleeding risk NSAIDs platelets..." (word salad)</p>
+                    </div>
+                    <div class="card-section correct">
+                        <p>✓ What It Got Right:</p>
+                        <p>Learned associations between keywords</p>
+                    </div>
+                    <div class="card-section gap">
+                        <p>⚠ Critical Gap:</p>
+                        <p>No structure. No clear answer. Rambling.</p>
+                    </div>
+                </div>
+
+                <div class="medical-card purple">
+                    <h4>SFT</h4>
+                    <div class="card-section">
+                        <p>Output:</p>
+                        <p>"Warfarin + NSAID = increased bleeding risk. CONTRAINDICATED. Use acetaminophen instead."</p>
+                    </div>
+                    <div class="card-section correct">
+                        <p>✓ What It Got Right:</p>
+                        <p>Clear structure. Safe answer. Follows format.</p>
+                    </div>
+                    <div class="card-section gap">
+                        <p>⚠ Critical Gap:</p>
+                        <p>Limited to training data. No mechanism to improve.</p>
+                    </div>
+                </div>
+
+                <div class="medical-card green">
+                    <h4>RLHF</h4>
+                    <div class="card-section">
+                        <p>Output:</p>
+                        <p>"Contraindicated. NSAIDs inhibit platelet aggregation + enhance warfarin anticoagulation → 2-3x bleeding risk. ALTERNATIVES: Acetaminophen, topical diclofenac. Monitor INR if absolutely necessary."</p>
+                    </div>
+                    <div class="card-section correct">
+                        <p>✓ What It Got Right:</p>
+                        <p>Nuanced. Mechanism explained. Specific alternatives.</p>
+                    </div>
+                    <div class="card-section gap">
+                        <p>⚠ Critical Gap:</p>
+                        <p>None—exceeds expectations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Mathematical Summary -->
+    <section class="dark-bg">
+        <div class="container">
+            <h2>11. Mathematical Summary & Key Equations</h2>
+
+            <div class="equations-grid">
+                <div class="equation-card">
+                    <h3>11.1 Pretraining</h3>
+                    <div class="equation-box">
+                        <code>L_pretrain = -Σ log P_θ(w_t | w_&lt;t)</code>
+                    </div>
+                    <p>Cross-entropy loss. Gradient descent minimizes; equivalent to maximizing data likelihood.</p>
+                </div>
+
+                <div class="equation-card">
+                    <h3>11.2 SFT</h3>
+                    <div class="equation-box">
+                        <code>L_SFT = -Σ log π_θ(y_expert | x)</code>
+                    </div>
+                    <p>Behavioral cloning. Force model to match expert demonstrations token-by-token.</p>
+                </div>
+
+                <div class="equation-card">
+                    <h3>11.3 RM Training</h3>
+                    <div class="equation-box">
+                        <code>L_RM = -E[log σ(r_RM(x,y_w) - r_RM(x,y_l))]</code>
+                    </div>
+                    <p>Bradley-Terry loss. Preference logit = sigmoid of reward difference.</p>
+                </div>
+
+                <div class="equation-card">
+                    <h3>11.4 PPO</h3>
+                    <div class="equation-box">
+                        <code>L_PPO = E[min(r_t*A_t, clip(r_t, 1-ε, 1+ε)*A_t)] - β*KL(π||π_ref)</code>
+                    </div>
+                    <p>Clipped objective prevents policy from changing too drastically. KL term ensures stability.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Alignment in Pharma -->
+    <section>
+        <div class="container">
+            <h2 class="green-gradient">12. Alignment in Pharmaceutical AI</h2>
+
+            <h3 style="color: #2dd4bf;">12.1 Why Alignment Is Critical in Medicine</h3>
+            <div style="background: linear-gradient(135deg, rgba(127, 29, 29, 0.2), rgba(120, 53, 15, 0.2)); border: 1px solid rgba(248, 113, 113, 0.3); border-radius: 12px; padding: 32px; margin-bottom: 32px;">
+                <p style="font-size: 1.125rem; color: #f1f5f9;">
+                    <span style="color: #f87171; font-weight: bold;">Unlike general-purpose AI,</span> pharmaceutical AI has life-or-death consequences. 
+                    <span style="color: #f87171; font-weight: bold;">Misalignment = patient harm.</span>
+                </p>
+            </div>
+
+            <h4 style="font-size: 1.25rem; font-weight: 600; color: #2dd4bf; margin-bottom: 24px;">Three Alignment Pillars for Pharmaceutical AI</h4>
+            <div class="alignment-pillars">
+                <div class="pillar">
+                    <div class="pillar-icon">✓</div>
+                    <h5>Accuracy</h5>
+                    <p>Medical information must be correct; outdated info causes harm</p>
+                    <div class="pillar-metric">≥95%</div>
+                </div>
+                <div class="pillar">
+                    <div class="pillar-icon">⚠</div>
+                    <h5>Safety</h5>
+                    <p>Proactively warn about contraindications, dangers, edge cases</p>
+                    <div class="pillar-metric">100% (no false negatives)</div>
+                </div>
+                <div class="pillar">
+                    <div class="pillar-icon">?</div>
+                    <h5>Humility</h5>
+                    <p>Admit uncertainty; never overstate confidence</p>
+                    <div class="pillar-metric">Zero absolute claims</div>
+                </div>
+            </div>
+
+            <h3 style="color: #2dd4bf; margin-top: 48px;">12.2 Alignment Evaluation Metrics</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Definition</th>
+                            <th>How to Measure</th>
+                            <th>Target</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="color: #2dd4bf; font-weight: 600;">Accuracy</td>
+                            <td>% correct info vs reference standard</td>
+                            <td>Expert review of 100 responses</td>
+                            <td style="color: #4ade80;">≥95%</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #2dd4bf; font-weight: 600;">Safety</td>
+                            <td>% identifies contraindications</td>
+                            <td>100 dangerous drug pairs; count correct warnings</td>
+                            <td style="color: #4ade80;">100%</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #2dd4bf; font-weight: 600;">Humility</td>
+                            <td>% admits uncertainty appropriately</td>
+                            <td>Review for overconfident claims</td>
+                            <td style="color: #4ade80;">Zero absolute claims</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Key Takeaways -->
+    <section class="dark-bg">
+        <div class="container">
+            <h2 class="yellow-gradient">13. Key Takeaways</h2>
+
+            <div class="takeaways-grid">
+                <div class="takeaway-box blue-accent">
+                    <h3>Why Three Stages Are Essential</h3>
+                    <ul class="takeaway-list">
+                        <li><span>1.</span> <span class="blue">Pretraining:</span> Statistical foundation. Learn from scale. But no alignment or understanding.</li>
+                        <li><span>2.</span> <span class="blue">SFT:</span> Behavioral shaping. Teach structure + format. But limited by dataset size and quality.</li>
+                        <li><span>3.</span> <span class="blue">RLHF:</span> Nuanced alignment. Learn from preferences. Improve beyond expert demonstrations.</li>
+                    </ul>
+                </div>
+
+                <div class="takeaway-box green-accent">
+                    <h3>For Pharmaceutical Applications</h3>
+                    <ul class="takeaway-list">
+                        <li><span>⚡</span> <span class="green">Safety:</span> RLHF learns which warnings matter most to domain experts</li>
+                        <li><span>⚡</span> <span class="green">Accuracy:</span> Pretraining + SFT + RLHF layers ensure correct medical information</li>
+                        <li><span>⚡</span> <span class="green">Productivity:</span> Aligned model focuses on relevant data discovery, saving researcher time</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bottom-line">
+                <h3>🧠 The Bottom Line</h3>
+                <p>
+                    Each stage of the training pipeline serves a distinct purpose. <span class="blue">Pretraining</span> builds statistical foundations from massive data. 
+                    <span class="purple">SFT</span> teaches structured behavior. <span class="green">RLHF</span> aligns the model with human values and expert preferences. 
+                    In pharmaceutical applications, this three-stage approach is essential to ensure safety, accuracy, and appropriately calibrated confidence—ultimately serving clinicians and protecting patients.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Further Reading & References</p>
+        <div class="footer-grid">
+            <p>Christiano et al. (2017): Deep Reinforcement Learning from Human Preferences</p>
+            <p>Ouyang et al. (2022): Training language models to follow instructions with human feedback</p>
+            <p>Schulman et al. (2017): Proximal Policy Optimization Algorithms</p>
+            <p>Bradley & Terry (1952): Rank Analysis of Incomplete Block Designs</p>
+        </div>
+    </footer>
+
+    <script>
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.querySelector('.progress-bar').style.width = scrolled + '%';
+        });
+
+        // Challenge Toggle
+        function showChallenge(index) {
+            // Hide all challenges
+            for (let i = 0; i < 4; i++) {
+                const element = document.getElementById(`challenge-${i}`);
+                if (element) element.style.display = 'none';
+            }
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.challenge-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected challenge
+            const selectedElement = document.getElementById(`challenge-${index}`);
+            if (selectedElement) selectedElement.style.display = 'block';
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Smooth scroll on load
+        window.addEventListener('load', () => {
+            document.documentElement.style.scrollBehavior = 'smooth';
+        });
+    </script>
+</body>
+</html>

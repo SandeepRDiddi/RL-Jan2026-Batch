@@ -1,0 +1,1200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Training Pipeline & Alignment - Interactive Infographic</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .content-wrapper {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease-out;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            border-bottom: 3px solid #f0f0f0;
+            padding-bottom: 0;
+        }
+
+        .tab-button {
+            padding: 15px 30px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 4px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -3px;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+            background: #f9f9f9;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .tab-button.active {
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 4px solid #667eea;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* STAGE CARDS */
+        .stages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .stage-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stage-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+            border-left-color: #764ba2;
+        }
+
+        .stage-card.stage-1 {
+            border-left-color: #FF6B6B;
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFB3B3 100%);
+        }
+
+        .stage-card.stage-2 {
+            border-left-color: #4ECDC4;
+            background: linear-gradient(135deg, #E0F7F6 0%, #B3F0EB 100%);
+        }
+
+        .stage-card.stage-3 {
+            border-left-color: #FFD93D;
+            background: linear-gradient(135deg, #FFF8DC 0%, #FFE6A3 100%);
+        }
+
+        .stage-card.stage-4 {
+            border-left-color: #A8E6CF;
+            background: linear-gradient(135deg, #E8F8F5 0%, #C8F5E6 100%);
+        }
+
+        .stage-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .stage-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .stage-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .stage-math {
+            background: rgba(255,255,255,0.7);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            color: #d63384;
+            font-weight: bold;
+        }
+
+        .example-box {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .example-box strong {
+            color: #667eea;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .pros, .cons {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .pros {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .cons {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .pros::before {
+            content: "✓ Advantages: ";
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .cons::before {
+            content: "✗ Limitations: ";
+            font-weight: bold;
+            color: #c62828;
+        }
+
+        /* PIPELINE COMPARISON */
+        .pipeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .pipeline-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+
+        .pipeline-table td {
+            padding: 18px 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .pipeline-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pipeline-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .pipeline-table tr:hover {
+            background: #f0f4ff;
+        }
+
+        /* CHALLENGES SECTION */
+        .challenges-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .challenge-card {
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-critical {
+            border-left-color: #d32f2f;
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        }
+
+        .challenge-high {
+            border-left-color: #f57c00;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        }
+
+        .challenge-medium {
+            border-left-color: #fbc02d;
+            background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%);
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .challenge-severity {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .severity-critical {
+            background: #d32f2f;
+        }
+
+        .severity-high {
+            background: #f57c00;
+        }
+
+        .severity-medium {
+            background: #fbc02d;
+            color: #333;
+        }
+
+        .challenge-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .challenge-content {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* ALIGNMENT METRICS */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .metric-name {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .metric-bar-container {
+            margin: 15px 0;
+        }
+
+        .metric-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .metric-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .metric-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .metric-gap {
+            background: #ffcdd2;
+            height: 100%;
+        }
+
+        .metric-definition {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        /* PHARMA EXAMPLES */
+        .examples-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .example-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .example-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* FLOW DIAGRAM */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .flow-box {
+            background: white;
+            border: 3px solid;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            min-width: 150px;
+            flex: 1;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .flow-box.stage-1 { border-color: #FF6B6B; }
+        .flow-box.stage-2 { border-color: #4ECDC4; }
+        .flow-box.stage-3 { border-color: #FFD93D; }
+        .flow-box.stage-4 { border-color: #A8E6CF; }
+
+        .flow-arrow {
+            font-size: 2em;
+            color: #667eea;
+            align-self: center;
+        }
+
+        @media (max-width: 768px) {
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+            
+            .flow-container {
+                flex-direction: column;
+            }
+        }
+
+        .flow-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .flow-desc {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        /* ANIMATIONS */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            font-size: 0.95em;
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .tabs {
+                display: none;
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .content-wrapper {
+                padding: 20px;
+            }
+
+            .stages-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 LLM Training & Alignment Pipeline</h1>
+            <p>Complete Journey from Pretraining to Reinforcement Learning from Human Feedback</p>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- NAVIGATION TABS -->
+            <div class="tabs">
+                <button class="tab-button active" onclick="showTab('overview')">📊 Overview</button>
+                <button class="tab-button" onclick="showTab('stages')">🎯 4 Training Stages</button>
+                <button class="tab-button" onclick="showTab('detailed')">📖 Detailed Analysis</button>
+                <button class="tab-button" onclick="showTab('challenges')">⚠️ Challenges</button>
+                <button class="tab-button" onclick="showTab('alignment')">✓ Alignment Metrics</button>
+                <button class="tab-button" onclick="showTab('pharma')">💊 Pharmaceutical Examples</button>
+            </div>
+
+            <!-- TAB 1: OVERVIEW -->
+            <div id="overview" class="tab-content active">
+                <h2 style="color: #667eea; margin-bottom: 20px; font-size: 2em;">🚀 Complete LLM Training Pipeline</h2>
+                
+                <p style="font-size: 1.05em; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                    Modern language models go through <strong>4 critical stages</strong> to become safe, helpful, and aligned with human values. 
+                    Each stage builds on the previous one, solving specific limitations and unlocking new capabilities.
+                </p>
+
+                <div class="flow-container">
+                    <div class="flow-box stage-1">
+                        <div class="flow-label">Stage 1</div>
+                        <div class="flow-desc">Pretraining</div>
+                        <div style="margin-top: 8px; font-size: 0.8em; color: #999;">Next-Token Prediction</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box stage-2">
+                        <div class="flow-label">Stage 2</div>
+                        <div class="flow-desc">SFT</div>
+                        <div style="margin-top: 8px; font-size: 0.8em; color: #999;">Expert Demonstrations</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box stage-3">
+                        <div class="flow-label">Stage 3</div>
+                        <div class="flow-desc">Reward Model</div>
+                        <div style="margin-top: 8px; font-size: 0.8em; color: #999;">Preference Learning</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box stage-4">
+                        <div class="flow-label">Stage 4</div>
+                        <div class="flow-desc">PPO</div>
+                        <div style="margin-top: 8px; font-size: 0.8em; color: #999;">Policy Optimization</div>
+                    </div>
+                </div>
+
+                <h3 style="color: #333; margin-top: 40px; margin-bottom: 20px;">Why All 4 Stages Matter</h3>
+                
+                <table class="pipeline-table">
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Primary Goal</th>
+                            <th>Critical Problem Solved</th>
+                            <th>Remaining Gap</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong style="color: #FF6B6B;">Pretraining</strong></td>
+                            <td>Learn language patterns from massive text</td>
+                            <td>Creates linguistic foundation</td>
+                            <td>❌ No safety or alignment</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #4ECDC4;">SFT</strong></td>
+                            <td>Teach instruction-following from experts</td>
+                            <td>Enables safe behaviors</td>
+                            <td>❌ Limited by expert dataset</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #FFD93D;">Reward Model</strong></td>
+                            <td>Learn to rank responses on human preferences</td>
+                            <td>Can score novel responses</td>
+                            <td>❌ Distribution shift problem</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #A8E6CF;">PPO</strong></td>
+                            <td>Optimize policy toward high rewards</td>
+                            <td>Expert-level aligned performance</td>
+                            <td>✓ Complete!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TAB 2: DETAILED STAGES -->
+            <div id="stages" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em;">🎯 The 4 Training Stages Explained</h2>
+
+                <div class="stages-grid">
+                    <!-- STAGE 1 -->
+                    <div class="stage-card stage-1">
+                        <div class="stage-number" style="background: linear-gradient(135deg, #FF6B6B 0%, #ee5a52 100%);">1</div>
+                        <div class="stage-title">Pretraining</div>
+                        <div class="stage-description">
+                            Model learns to predict the next token given previous tokens. Trained on billions of words from the internet.
+                        </div>
+                        <div class="stage-math">Loss = -Σ log P(w_t | w_&lt;t)</div>
+                        <div class="example-box">
+                            <strong>Example:</strong> Given "The patient has fever and", model predicts likely next word: "cough", "fatigue", etc.
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">Broad linguistic foundation from massive scale</div>
+                            <div class="cons">Generates harmful content, no value alignment</div>
+                        </div>
+                    </div>
+
+                    <!-- STAGE 2 -->
+                    <div class="stage-card stage-2">
+                        <div class="stage-number" style="background: linear-gradient(135deg, #4ECDC4 0%, #44adb6 100%);">2</div>
+                        <div class="stage-title">SFT</div>
+                        <div class="stage-description">
+                            Model learns from 10k-100k curated expert demonstrations. Each example shows how to respond to instructions correctly.
+                        </div>
+                        <div class="stage-math">L_SFT = -E[Σ log π(expert_response | instruction)]</div>
+                        <div class="example-box">
+                            <strong>Example:</strong><br/>
+                            Instruction: "Warfarin + NSAIDs dangerous?"<br/>
+                            Expert: "Yes. 2-3x bleeding risk. Use acetaminophen instead."
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">Teaches instruction-following and safety</div>
+                            <div class="cons">Limited by expert dataset size and quality</div>
+                        </div>
+                    </div>
+
+                    <!-- STAGE 3 -->
+                    <div class="stage-card stage-3">
+                        <div class="stage-number" style="background: linear-gradient(135deg, #FFD93D 0%, #ffc700 100%);">3</div>
+                        <div class="stage-title">Reward Model</div>
+                        <div class="stage-description">
+                            Model learns to score responses based on 20k human preference comparisons using Bradley-Terry loss.
+                        </div>
+                        <div class="stage-math">L_RM = -log σ(r(y_pref) - r(y_dispref))</div>
+                        <div class="example-box">
+                            <strong>Example Preference:</strong><br/>
+                            Preferred: "eGFR >60: 100%, 30-59: 75%, <30: 50%"<br/>
+                            Dispreferred: "Just reduce dose if kidneys are bad"
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">Can score novel responses beyond training data</div>
+                            <div class="cons">Vulnerable to distribution shift when policy changes</div>
+                        </div>
+                    </div>
+
+                    <!-- STAGE 4 -->
+                    <div class="stage-card stage-4">
+                        <div class="stage-number" style="background: linear-gradient(135deg, #A8E6CF 0%, #95dcc4 100%);">4</div>
+                        <div class="stage-title">PPO</div>
+                        <div class="stage-description">
+                            Proximal Policy Optimization: Uses the reward model to actively improve policy while staying close to SFT baseline.
+                        </div>
+                        <div class="stage-math">L = E[min(r_t·A_t, clip(r_t, 1±ε)·A_t)] - β·KL(π||π_ref)</div>
+                        <div class="example-box">
+                            <strong>Result:</strong> Response quality improves +64% on average over SFT through iterative policy optimization.
+                        </div>
+                        <div class="pros-cons">
+                            <div class="pros">Expert-level aligned performance achieved</div>
+                            <div class="cons">Computationally expensive, reward hacking possible</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: DETAILED ANALYSIS -->
+            <div id="detailed" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em;">📖 Deep Dive: Mathematical Foundations</h2>
+
+                <h3 style="color: #333; margin: 30px 0 20px 0;">Stage 1: Pretraining - Next Token Prediction</h3>
+                <div style="background: #f9f9f9; padding: 20px; border-left: 4px solid #FF6B6B; border-radius: 8px; margin-bottom: 20px;">
+                    <p><strong>Objective:</strong> Minimize cross-entropy loss on predicting next token</p>
+                    <p style="font-family: monospace; color: #d63384; margin: 10px 0;">Loss = -Σ log P(w_t | w_1, w_2, ..., w_{t-1})</p>
+                    <p style="margin-top: 15px;"><strong>Key Insight:</strong> Model learns statistical correlations from training data, but has no concept of safety, truthfulness, or helpfulness. A pretrained model on pharmaceutical text would learn that "warfarin" often co-occurs with "bleeding" without understanding WHY.</p>
+                </div>
+
+                <h3 style="color: #333; margin: 30px 0 20px 0;">Stage 2: SFT - Behavioral Cloning</h3>
+                <div style="background: #f9f9f9; padding: 20px; border-left: 4px solid #4ECDC4; border-radius: 8px; margin-bottom: 20px;">
+                    <p><strong>Objective:</strong> Teach model to mimic expert behavior through supervised learning</p>
+                    <p style="font-family: monospace; color: #d63384; margin: 10px 0;">L_SFT = -E[(x,y)~D][Σ_i log π(y_i | x, y_{<i})]</p>
+                    <p style="margin-top: 15px;"><strong>Dataset Example:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Input: "Elderly patient on 5 drugs with depression. Antidepressant choice?"</li>
+                        <li>Expert: "Avoid tricyclics (anticholinergic risk). Use SSRI or SNRI. Monitor for hyponatremia."</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Limitation:</strong> SFT only teaches what's in the dataset. If experts all miss a drug interaction, the model will too. It's "capped" by the quality of expert demonstrations.</p>
+                </div>
+
+                <h3 style="color: #333; margin: 30px 0 20px 0;">Stage 3: Reward Model - Bradley-Terry Preference Learning</h3>
+                <div style="background: #f9f9f9; padding: 20px; border-left: 4px solid #FFD93D; border-radius: 8px; margin-bottom: 20px;">
+                    <p><strong>Objective:</strong> Learn to predict human preferences between two responses</p>
+                    <p style="font-family: monospace; color: #d63384; margin: 10px 0;">P(prefer y_w | y_l, x) = σ(r(x, y_w) - r(x, y_l))</p>
+                    <p style="margin-top: 15px;"><strong>Real Preference Example:</strong></p>
+                    <div style="background: white; border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                        <p><strong>Query:</strong> "Metformin + cirrhosis = safe?"</p>
+                        <p style="margin: 10px 0;"><strong style="color: #4caf50;">✓ Preferred:</strong> "Contraindicated. Severe lactic acidosis risk. Use insulin, GLP-1, SGLT2i instead."</p>
+                        <p style="margin: 10px 0;"><strong style="color: #f44336;">✗ Dispreferred:</strong> "Fine to use. Just monitor kidney function."</p>
+                    </div>
+                    <p style="margin-top: 15px;"><strong>Key Advantage:</strong> RM can score ANY response, even novel ones the model generates. This breaks the "expert dataset cap" of SFT.</p>
+                </div>
+
+                <h3 style="color: #333; margin: 30px 0 20px 0;">Stage 4: PPO - Policy Optimization</h3>
+                <div style="background: #f9f9f9; padding: 20px; border-left: 4px solid #A8E6CF; border-radius: 8px; margin-bottom: 20px;">
+                    <p><strong>Objective:</strong> Maximize reward while staying close to SFT policy (avoid catastrophic forgetting)</p>
+                    <p style="font-family: monospace; color: #d63384; margin: 10px 0; word-break: break-all;">L_PPO = E[min(r_t·A_t, clip(r_t, 1-ε, 1+ε)·A_t)] - β·KL(π||π_ref)</p>
+                    <p style="margin-top: 15px;"><strong>Why PPO?</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Clipping:</strong> Prevents overly large policy updates in single step</li>
+                        <li><strong>KL Penalty:</strong> Keeps new policy close to SFT baseline, preventing "catastrophic forgetting"</li>
+                        <li><strong>Advantage Function:</strong> Only improves actions that lead to good outcomes</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Results:</strong> Response quality improves +64% on average (from SFT to PPO)</p>
+                </div>
+            </div>
+
+            <!-- TAB 4: CHALLENGES -->
+            <div id="challenges" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em;">⚠️ RLHF Challenges & Solutions</h2>
+
+                <div class="challenges-container">
+                    <!-- CHALLENGE 1 -->
+                    <div class="challenge-card challenge-critical">
+                        <div class="challenge-severity severity-critical">CRITICAL</div>
+                        <div class="challenge-title">Reward Hacking</div>
+                        <div class="challenge-content">
+                            <p style="margin-bottom: 12px;"><strong>Problem:</strong> Policy exploits RM defects rather than genuinely improving.</p>
+                            <p style="margin-bottom: 12px;"><strong>Example:</strong> If RM rewards length, model generates verbose repetitive text: "The reason is that the reason is that the reason is..."</p>
+                            <p><strong>Solutions:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 8px;">
+                                <li>Human validation of PPO outputs</li>
+                                <li>Ensemble reward models (average 3-5 RMs)</li>
+                                <li>Strong KL regularization (high β)</li>
+                                <li>Red-teaming to find exploits</li>
+                            </ul>
+                            <p style="margin-top: 12px; font-weight: bold; color: #d32f2f;">Mitigation Effectiveness: <span style="color: #333;">92%</span></p>
+                        </div>
+                    </div>
+
+                    <!-- CHALLENGE 2 -->
+                    <div class="challenge-card challenge-high">
+                        <div class="challenge-severity severity-high">HIGH</div>
+                        <div class="challenge-title">Annotation Quality</div>
+                        <div class="challenge-content">
+                            <p style="margin-bottom: 12px;"><strong>Problem:</strong> Different annotators have conflicting preferences.</p>
+                            <p style="margin-bottom: 12px;"><strong>Example:</strong> Annotator A prioritizes safety (specific eGFR cutoffs), Annotator B prioritizes flexibility (alternatives offered).</p>
+                            <p><strong>Solutions:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 8px;">
+                                <li>Inter-rater reliability threshold (Fleiss' kappa ≥0.6)</li>
+                                <li>Multi-annotator consensus (2/3 agreement required)</li>
+                                <li>Calibration training for annotators</li>
+                                <li>Domain expert oversight</li>
+                            </ul>
+                            <p style="margin-top: 12px; font-weight: bold; color: #f57c00;">Mitigation Effectiveness: <span style="color: #333;">85%</span></p>
+                        </div>
+                    </div>
+
+                    <!-- CHALLENGE 3 -->
+                    <div class="challenge-card challenge-high">
+                        <div class="challenge-severity severity-high">HIGH</div>
+                        <div class="challenge-title">Distribution Shift</div>
+                        <div class="challenge-content">
+                            <p style="margin-bottom: 12px;"><strong>Problem:</strong> RM trained on SFT outputs; PPO generates increasingly different responses.</p>
+                            <p style="margin-bottom: 12px;"><strong>Example:</strong> RM confident on in-distribution samples but unreliable on novel PPO-generated pharmaceutical advice.</p>
+                            <p><strong>Solutions:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 8px;">
+                                <li>Active learning: collect preferences on PPO outputs</li>
+                                <li>Iterative RM retraining (RM→PPO→RM cycles)</li>
+                                <li>Confidence-calibrated uncertainty</li>
+                                <li>Out-of-distribution detection</li>
+                            </ul>
+                            <p style="margin-top: 12px; font-weight: bold; color: #f57c00;">Mitigation Effectiveness: <span style="color: #333;">78%</span></p>
+                        </div>
+                    </div>
+
+                    <!-- CHALLENGE 4 -->
+                    <div class="challenge-card challenge-medium">
+                        <div class="challenge-severity severity-medium">MEDIUM</div>
+                        <div class="challenge-title">Scalability</div>
+                        <div class="challenge-content">
+                            <p style="margin-bottom: 12px;"><strong>Problem:</strong> Expert time is expensive. 50k preferences ≈ $500k cost (at $200/hr).</p>
+                            <p style="margin-bottom: 12px;"><strong>Example:</strong> Pharmacist: 30 min per 10 preferences = 2500 hours for 50k pairs.</p>
+                            <p><strong>Solutions:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 8px;">
+                                <li>Focus on high-value, diverse examples</li>
+                                <li>RM-guided sampling (high-uncertainty pairs)</li>
+                                <li>Crowdsourcing with expert validation</li>
+                                <li>Transfer learning from other domains</li>
+                            </ul>
+                            <p style="margin-top: 12px; font-weight: bold; color: #fbc02d;">Mitigation Effectiveness: <span style="color: #333;">80%</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: ALIGNMENT METRICS -->
+            <div id="alignment" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em;">✓ Alignment Evaluation Scorecard</h2>
+                <p style="color: #666; font-size: 1.05em; margin-bottom: 30px;">
+                    Evaluating how well a pharmaceutical LLM aligns with human expectations and clinical best practices.
+                </p>
+
+                <div class="metrics-grid">
+                    <!-- METRIC 1 -->
+                    <div class="metric-card">
+                        <div class="metric-name">💊 Medical Accuracy</div>
+                        <div class="metric-definition">% of medical information correct vs evidence-based standards (guidelines, literature)</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Current Performance</span>
+                                <span>91%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 91%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);">91%</div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Target Performance</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 95%; background: #ddd;">
+                                    <div style="width: 4%; height: 100%; background: #ff9800; display: flex; align-items: center; color: #333;"></div>
+                                    <span style="flex: 1; color: #666;">95%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 12px; padding: 12px; background: #fff3e0; border-radius: 8px; font-size: 0.9em; color: #e65100;">
+                            <strong>Gap: 4%</strong> | Assessment: Expert review of 100 responses vs guidelines
+                        </p>
+                    </div>
+
+                    <!-- METRIC 2 -->
+                    <div class="metric-card">
+                        <div class="metric-name">🛡️ Safety (Contraindication Recall)</div>
+                        <div class="metric-definition">% of dangerous drug combinations correctly identified</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Current</span>
+                                <span>94%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 94%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);">94%</div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Target</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 100%; background: #ddd;">
+                                    <div style="width: 6%; height: 100%; background: #ff9800;"></div>
+                                    <span style="flex: 1; color: #666;"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 12px; padding: 12px; background: #fff3e0; border-radius: 8px; font-size: 0.9em; color: #e65100;">
+                            <strong>Gap: 6%</strong> | Assessment: 100 contraindicated combinations; count warnings
+                        </p>
+                    </div>
+
+                    <!-- METRIC 3 -->
+                    <div class="metric-card">
+                        <div class="metric-name">🎯 Specificity</div>
+                        <div class="metric-definition">Avoiding incorrect warnings on safe combinations (false positive rate)</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Current</span>
+                                <span>89%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 89%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);">89%</div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Target</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 95%; background: #ddd;">
+                                    <div style="width: 6%; height: 100%; background: #ff9800;"></div>
+                                    <span style="flex: 1; color: #666;"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 12px; padding: 12px; background: #fff3e0; border-radius: 8px; font-size: 0.9em; color: #e65100;">
+                            <strong>Gap: 6%</strong> | Assessment: Expert judgment of warning appropriateness
+                        </p>
+                    </div>
+
+                    <!-- METRIC 4 -->
+                    <div class="metric-card">
+                        <div class="metric-name">💯 Dose Calculation Accuracy</div>
+                        <div class="metric-definition">Correctness of dosing calculations for various patient types and conditions</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Current</span>
+                                <span>91%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 91%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);">91%</div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Target</span>
+                                <span>98%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 98%; background: #ddd;">
+                                    <div style="width: 7%; height: 100%; background: #ff9800;"></div>
+                                    <span style="flex: 1; color: #666;"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 12px; padding: 12px; background: #fff3e0; border-radius: 8px; font-size: 0.9em; color: #e65100;">
+                            <strong>Gap: 7%</strong> | Assessment: Pharmacist verification of 50 calculations
+                        </p>
+                    </div>
+
+                    <!-- METRIC 5 -->
+                    <div class="metric-card">
+                        <div class="metric-name">🤔 Humility</div>
+                        <div class="metric-definition">Model admits limitations; avoids overconfident absolute claims</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Current</span>
+                                <span>87%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 87%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);">87%</div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-label">
+                                <span>Target</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" style="width: 100%; background: #ddd;">
+                                    <div style="width: 13%; height: 100%; background: #ff9800;"></div>
+                                    <span style="flex: 1; color: #666;"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 12px; padding: 12px; background: #fff3e0; border-radius: 8px; font-size: 0.9em; color: #e65100;">
+                            <strong>Gap: 13%</strong> | Assessment: Manual review for overconfident statements
+                        </p>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 15px; padding: 30px; margin-top: 40px;">
+                    <h3 style="color: #333; margin-bottom: 20px;">📊 Overall Alignment Summary</h3>
+                    <table style="width: 100%; text-align: center;">
+                        <tr style="font-weight: bold; color: white; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <td style="padding: 15px;">Average Current</td>
+                            <td style="padding: 15px;">Average Target</td>
+                            <td style="padding: 15px;">Average Gap</td>
+                        </tr>
+                        <tr style="background: white; border-top: 2px solid #ddd;">
+                            <td style="padding: 15px; font-size: 1.2em; color: #667eea; font-weight: bold;">90%</td>
+                            <td style="padding: 15px; font-size: 1.2em; color: #764ba2; font-weight: bold;">97.6%</td>
+                            <td style="padding: 15px; font-size: 1.2em; color: #ff9800; font-weight: bold;">7.6%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 6: PHARMACEUTICAL EXAMPLES -->
+            <div id="pharma" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 30px; font-size: 2em;">💊 Real Pharmaceutical Applications</h2>
+
+                <div class="examples-section">
+                    <h3 style="color: #333; margin-bottom: 20px;">Category 1: Renal Dosing Adjustments</h3>
+                    <div class="examples-grid">
+                        <div class="example-item">
+                            <strong>eGFR > 60 mL/min</strong>
+                            Normal kidney function. No dose adjustment needed. Full therapeutic dosing.
+                        </div>
+                        <div class="example-item">
+                            <strong>eGFR 30-59 mL/min</strong>
+                            Mild-moderate impairment. Typical adjustment: 50-75% of normal dose. Monitor closely.
+                        </div>
+                        <div class="example-item">
+                            <strong>eGFR < 30 mL/min</strong>
+                            Severe impairment. Typical adjustment: 25-50% of normal dose or contraindicated. Intensive monitoring.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="examples-section">
+                    <h3 style="color: #333; margin-bottom: 20px;">Category 2: Critical Drug Interactions</h3>
+                    <div class="examples-grid">
+                        <div class="example-item">
+                            <strong>Warfarin + NSAIDs</strong>
+                            ❌ CONTRAINDICATED. 2-3x increased bleeding risk. NSAIDs inhibit platelet function AND enhance warfarin effects. ALTERNATIVE: Acetaminophen.
+                        </div>
+                        <div class="example-item">
+                            <strong>ACE Inhibitor + K-Sparing Diuretic</strong>
+                            ⚠️ MONITOR. Both drugs increase serum potassium. Check K+ at baseline, 1 week, then monthly. Contraindicated if K+ > 5.5.
+                        </div>
+                        <div class="example-item">
+                            <strong>Grapefruit + Statin</strong>
+                            ❌ CONTRAINDICATED. Grapefruit inhibits CYP3A4, increasing statin levels 10-16x. Risk of myopathy. ALTERNATIVE: Pravastatin or rosuvastatin.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="examples-section">
+                    <h3 style="color: #333; margin-bottom: 20px;">Category 3: Contraindications</h3>
+                    <div class="examples-grid">
+                        <div class="example-item">
+                            <strong>Metformin + Cirrhosis</strong>
+                            ❌ ABSOLUTE CONTRAINDICATION. Severe lactic acidosis risk. Impaired hepatic metabolism. ALTERNATIVES: Insulin, GLP-1 agonist, SGLT2 inhibitor.
+                        </div>
+                        <div class="example-item">
+                            <strong>ACE Inhibitor + Pregnancy (2nd/3rd Trimester)</strong>
+                            ❌ CONTRAINDICATED. Risk of fetal renal dysgenesis, oligohydramnios, fetal death. ALTERNATIVE: Methyldopa, labetalol, hydralazine.
+                        </div>
+                        <div class="example-item">
+                            <strong>NSAIDs + eGFR < 30</strong>
+                            ⚠️ GENERALLY AVOIDED. NSAIDs reduce renal perfusion in advanced kidney disease, worsening function. ALTERNATIVE: Acetaminophen, opioids.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="examples-section">
+                    <h3 style="color: #333; margin-bottom: 20px;">Category 4: Pharmacogenomics</h3>
+                    <div class="examples-grid">
+                        <div class="example-item">
+                            <strong>CYP2D6 Poor Metabolizers on Codeine</strong>
+                            ❌ INEFFECTIVE. Codeine requires CYP2D6 to convert to morphine (active form). Poor metabolizers cannot generate sufficient morphine. ALTERNATIVES: Morphine, oxycodone, tramadol.
+                        </div>
+                        <div class="example-item">
+                            <strong>CYP3A4 Inhibitors + Certain Drugs</strong>
+                            Examples: Grapefruit, clarithromycin, ketoconazole inhibit CYP3A4. Increases levels of statins, benzodiazepines, antiarrhythmics. Requires dose reduction.
+                        </div>
+                        <div class="example-item">
+                            <strong>Slow Acetylators + Isoniazid</strong>
+                            ⚠️ MONITOR. Slow acetylators metabolize isoniazid slowly, leading to higher levels and greater toxicity risk (peripheral neuropathy). May need dose reduction.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="examples-section">
+                    <h3 style="color: #333; margin-bottom: 20px;">Category 5: Special Populations</h3>
+                    <div class="examples-grid">
+                        <div class="example-item">
+                            <strong>Elderly on Anticholinergics</strong>
+                            ⚠️ HIGH RISK. Tricyclic antidepressants, antihistamines cause confusion, urinary retention, falls. PREFER: SSRIs, SNRIs (low anticholinergic effects).
+                        </div>
+                        <div class="example-item">
+                            <strong>Pediatric Dosing</strong>
+                            NOT simply "adult dose × (child weight / 70 kg)". Many drugs require age-specific calculations. Example: Aminophylline dosing differs by age. Always verify pediatric dosing.
+                        </div>
+                        <div class="example-item">
+                            <strong>Lactation & Drug Transfer</strong>
+                            ⚠️ Some drugs concentrate in breast milk. SSRIs, benzodiazepines, certain antibiotics have low infant risk. But codeine, doxycycline contraindicated during breastfeeding.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="examples-section">
+                    <h3 style="color: #333; margin-bottom: 20px;">Category 6: Monitoring & Toxicity</h3>
+                    <div class="examples-grid">
+                        <div class="example-item">
+                            <strong>Lithium Toxicity</strong>
+                            Therapeutic: 0.6-1.2 mEq/L. Toxicity > 2.0: tremor, confusion, arrhythmias. Risk in renal disease. Check level at baseline, 5 days, then q3-6 months.
+                        </div>
+                        <div class="example-item">
+                            <strong>Statin Myopathy</strong>
+                            ⚠️ Monitor for muscle pain, elevated CK. If CK > 1000 or symptomatic myopathy, DISCONTINUE statin. Check for rhabdomyolysis. Monitor electrolytes.
+                        </div>
+                        <div class="example-item">
+                            <strong>Theophylline Narrow Therapeutic Index</strong>
+                            Therapeutic: 10-20 μg/mL. Toxicity > 20: seizures, arrhythmias, death. Requires therapeutic drug monitoring. Interactions with many drugs and foods.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>🎓 Interactive LLM Training & Alignment Infographic | Created for Educational Purposes | Pharmaceutical AI Safety Focus</p>
+        <p>Use this in class to explain: Pretraining → SFT → Reward Model → PPO | Print-friendly & Mobile Responsive</p>
+    </footer>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
