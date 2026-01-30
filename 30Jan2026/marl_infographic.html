@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Reinforcement Learning: Complete Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0a0f1a;
+            --secondary-dark: #121a2e;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-orange: #f97316;
+            --accent-pink: #ec4899;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #1e293b;
+            --card-bg: rgba(18, 26, 46, 0.8);
+            --gradient-1: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --gradient-2: linear-gradient(135deg, #06b6d4, #10b981);
+            --gradient-3: linear-gradient(135deg, #f97316, #ec4899);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--primary-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Header Section */
+        .header {
+            padding: 80px 0 60px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: var(--gradient-1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--accent-blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .main-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 4.5rem;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        /* Navigation Pills */
+        .nav-pills {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .nav-pill {
+            padding: 12px 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-pill:hover, .nav-pill.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        /* Section Styling */
+        .section {
+            padding: 80px 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-blue);
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 15px;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 35px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        .card-icon.blue { background: rgba(59, 130, 246, 0.15); }
+        .card-icon.cyan { background: rgba(6, 182, 212, 0.15); }
+        .card-icon.purple { background: rgba(139, 92, 246, 0.15); }
+        .card-icon.emerald { background: rgba(16, 185, 129, 0.15); }
+        .card-icon.orange { background: rgba(249, 115, 22, 0.15); }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Feature Box */
+        .feature-box {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-box-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .feature-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+        }
+
+        /* Architecture Diagram */
+        .architecture-section {
+            background: var(--secondary-dark);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 60px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .arch-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .arch-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .arch-phase {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            position: relative;
+        }
+
+        .phase-label {
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background: var(--accent-blue);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .phase-label.execution {
+            background: var(--accent-emerald);
+        }
+
+        .phase-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .arch-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px 35px;
+            text-align: center;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .arch-box:hover {
+            border-color: var(--accent-blue);
+            transform: scale(1.05);
+        }
+
+        .arch-box.critic {
+            border-color: rgba(139, 92, 246, 0.5);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .arch-box.agent {
+            border-color: rgba(6, 182, 212, 0.5);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .arch-box-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .arch-box-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .arch-box-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .arch-arrow {
+            font-size: 2rem;
+            color: var(--accent-blue);
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 40px 0;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 20px 25px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: var(--secondary-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .comparison-table th:first-child {
+            width: 200px;
+        }
+
+        .comparison-table td {
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table td:first-child {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .table-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .table-tag.blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+        .table-tag.purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
+        .table-tag.cyan { background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); }
+        .table-tag.emerald { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); }
+
+        /* Flow Chart */
+        .flow-section {
+            padding: 60px 0;
+        }
+
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .flow-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border: 3px solid;
+            transition: all 0.3s ease;
+        }
+
+        .flow-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .flow-circle.blue { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
+        .flow-circle.cyan { border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1); }
+        .flow-circle.purple { border-color: var(--accent-purple); background: rgba(139, 92, 246, 0.1); }
+        .flow-circle.emerald { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.1); }
+        .flow-circle.orange { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.1); }
+
+        .flow-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .flow-sublabel {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        /* Code Block */
+        .code-section {
+            background: #0d1117;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 40px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot.red { background: #ff5f56; }
+        .code-dot.yellow { background: #ffbd2e; }
+        .code-dot.green { background: #27ca40; }
+
+        .code-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-left: 15px;
+        }
+
+        .code-body {
+            padding: 25px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .code-comment { color: #6e7681; }
+        .code-keyword { color: #ff7b72; }
+        .code-function { color: #d2a8ff; }
+        .code-string { color: #a5d6ff; }
+        .code-number { color: #79c0ff; }
+        .code-variable { color: #ffa657; }
+
+        /* Tool Stack */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-5px);
+        }
+
+        .tool-category {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .tool-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .tool-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tool-item {
+            padding: 8px 16px;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 60px auto;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-blue), var(--accent-purple), var(--accent-emerald));
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 30px 0 30px 40px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -25px;
+            top: 35px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            border: 4px solid var(--primary-dark);
+        }
+
+        .timeline-item:nth-child(2) .timeline-dot { background: var(--accent-purple); }
+        .timeline-item:nth-child(3) .timeline-dot { background: var(--accent-cyan); }
+        .timeline-item:nth-child(4) .timeline-dot { background: var(--accent-emerald); }
+        .timeline-item:nth-child(5) .timeline-dot { background: var(--accent-orange); }
+
+        .timeline-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+        }
+
+        .timeline-step {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+        }
+
+        .timeline-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .timeline-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 60px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 80px;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-brand {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-title { font-size: 3rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .architecture-section { padding: 40px 25px; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .main-title { font-size: 2.5rem; }
+            .section-title { font-size: 2rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
+            .stat-number { font-size: 2.5rem; }
+            .flow-container { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+
+        @media print {
+            body { background: white; color: black; }
+            .bg-pattern, .grid-overlay { display: none; }
+            .card, .architecture-section, .code-section { 
+                border: 1px solid #ddd; 
+                background: #f9f9f9;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="badge">Advanced AI/ML Education</div>
+            <h1 class="main-title">Multi-Agent<br>Reinforcement Learning</h1>
+            <p class="subtitle">A comprehensive guide to CTDE, MADDPG, QMIX, and Replay Buffers — from theory to industry practice</p>
+            
+            <div class="nav-pills">
+                <span class="nav-pill active">CTDE Paradigm</span>
+                <span class="nav-pill">MADDPG</span>
+                <span class="nav-pill">QMIX</span>
+                <span class="nav-pill">Replay Buffer</span>
+                <span class="nav-pill">Tool Stack</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Stats Section -->
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">N</div>
+                    <div class="stat-label">Agents Learning<br>Simultaneously</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10⁶</div>
+                    <div class="stat-label">Replay Buffer<br>Capacity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">64</div>
+                    <div class="stat-label">Typical Batch<br>Size</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">γ</div>
+                    <div class="stat-label">Discount Factor<br>(0.95-0.99)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Core Problem -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">01 — THE CHALLENGE</div>
+                    <h2 class="section-title">The Multi-Agent Problem</h2>
+                    <p class="section-desc">Why standard RL fails when multiple agents learn together</p>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon blue">🌀</div>
+                        <h3 class="card-title">Non-Stationarity</h3>
+                        <p class="card-text">From each agent's perspective, the environment appears to change unpredictably because other agents are simultaneously learning and adapting their policies.</p>
+                        <div class="feature-box">
+                            <div class="feature-box-title">IMPACT</div>
+                            <ul class="feature-list">
+                                <li>Q-value estimates become unstable</li>
+                                <li>Convergence guarantees break down</li>
+                                <li>Policies oscillate without settling</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon purple">🎯</div>
+                        <h3 class="card-title">Credit Assignment</h3>
+                        <p class="card-text">When the team succeeds or fails, how do we determine each agent's contribution? Did Agent A's action help, or was it Agent B's cooperation?</p>
+                        <div class="feature-box">
+                            <div class="feature-box-title">CHALLENGE</div>
+                            <ul class="feature-list">
+                                <li>Rewards often shared across team</li>
+                                <li>Individual contributions masked</li>
+                                <li>Lazy agent problem emerges</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon cyan">📈</div>
+                        <h3 class="card-title">Scalability</h3>
+                        <p class="card-text">Joint action space grows exponentially: N agents with A actions each = A^N joint actions. This curse of dimensionality limits practical applications.</p>
+                        <div class="feature-box">
+                            <div class="feature-box-title">EXAMPLE</div>
+                            <ul class="feature-list">
+                                <li>5 agents × 10 actions = 100,000 combinations</li>
+                                <li>10 agents × 10 actions = 10 billion combinations</li>
+                                <li>Centralized approaches become intractable</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: CTDE -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">02 — THE PARADIGM</div>
+                    <h2 class="section-title">CTDE Framework</h2>
+                    <p class="section-desc">Centralized Training with Decentralized Execution</p>
+                </div>
+
+                <div class="architecture-section">
+                    <h3 class="arch-title">The Best of Both Worlds</h3>
+                    
+                    <div class="arch-diagram">
+                        <div class="arch-phase">
+                            <span class="phase-label">TRAINING PHASE — Centralized</span>
+                            <div class="phase-content">
+                                <div class="arch-box critic">
+                                    <div class="arch-box-label">CRITIC</div>
+                                    <div class="arch-box-title">Global View</div>
+                                    <div class="arch-box-sub">Sees all obs & actions</div>
+                                </div>
+                                <span class="arch-arrow">→</span>
+                                <div class="arch-box">
+                                    <div class="arch-box-label">OUTPUT</div>
+                                    <div class="arch-box-title">Q-Values</div>
+                                    <div class="arch-box-sub">Stable learning signals</div>
+                                </div>
+                                <span class="arch-arrow">→</span>
+                                <div class="arch-box agent">
+                                    <div class="arch-box-label">UPDATE</div>
+                                    <div class="arch-box-title">All Policies</div>
+                                    <div class="arch-box-sub">Coordinated improvement</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arch-phase">
+                            <span class="phase-label execution">EXECUTION PHASE — Decentralized</span>
+                            <div class="phase-content">
+                                <div class="arch-box agent">
+                                    <div class="arch-box-label">AGENT 1</div>
+                                    <div class="arch-box-title">obs₁ → a₁</div>
+                                    <div class="arch-box-sub">Local policy only</div>
+                                </div>
+                                <div class="arch-box agent">
+                                    <div class="arch-box-label">AGENT 2</div>
+                                    <div class="arch-box-title">obs₂ → a₂</div>
+                                    <div class="arch-box-sub">Local policy only</div>
+                                </div>
+                                <div class="arch-box agent">
+                                    <div class="arch-box-label">AGENT N</div>
+                                    <div class="arch-box-title">obsₙ → aₙ</div>
+                                    <div class="arch-box-sub">Local policy only</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cards-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="card">
+                        <div class="card-icon emerald">✓</div>
+                        <h3 class="card-title">Why It Works</h3>
+                        <ul class="feature-list">
+                            <li>Training uses privileged information (simulator access)</li>
+                            <li>Execution only requires local observations</li>
+                            <li>Critic stabilizes learning without deployment constraints</li>
+                            <li>Policies generalize to real-world partial observability</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon orange">⚡</div>
+                        <h3 class="card-title">Key Insight</h3>
+                        <p class="card-text">The critic learns "if I do X and others do Y, expected value is Z" — making the environment appear stationary. The policy only uses local info, so it works without communication at deployment.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: MADDPG -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">03 — ALGORITHM</div>
+                    <h2 class="section-title">MADDPG</h2>
+                    <p class="section-desc">Multi-Agent Deep Deterministic Policy Gradient</p>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card" style="grid-column: span 2;">
+                        <div class="card-icon blue">🔄</div>
+                        <h3 class="card-title">Actor-Critic Architecture</h3>
+                        <p class="card-text">Each agent maintains two neural networks that work together:</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px;">
+                            <div class="feature-box">
+                                <div class="feature-box-title">ACTOR (Policy μᵢ)</div>
+                                <ul class="feature-list">
+                                    <li>Input: Local observation oᵢ only</li>
+                                    <li>Output: Continuous action aᵢ</li>
+                                    <li>Used: Training AND execution</li>
+                                    <li>Goal: Maximize expected Q-value</li>
+                                </ul>
+                            </div>
+                            <div class="feature-box">
+                                <div class="feature-box-title">CRITIC (Qᵢ)</div>
+                                <ul class="feature-list">
+                                    <li>Input: ALL observations & actions</li>
+                                    <li>Output: Q-value for agent i</li>
+                                    <li>Used: Training ONLY</li>
+                                    <li>Goal: Accurate value estimation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon purple">📊</div>
+                        <h3 class="card-title">Critic Update</h3>
+                        <p class="card-text">Minimize TD error with full observability:</p>
+                        <div class="code-section" style="margin-top: 15px;">
+                            <div class="code-body">
+                                <span class="code-variable">L(θ)</span> = 𝔼[(<span class="code-function">Qᵢ</span>(o_all, a_all) - <span class="code-variable">y</span>)²]<br><br>
+                                <span class="code-comment">where target:</span><br>
+                                <span class="code-variable">y</span> = rᵢ + γ · <span class="code-function">Qᵢ'</span>(o'_all, μ'(o'_all))
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon cyan">🎯</div>
+                        <h3 class="card-title">Actor Update</h3>
+                        <p class="card-text">Policy gradient through the critic:</p>
+                        <div class="code-section" style="margin-top: 15px;">
+                            <div class="code-body">
+                                <span class="code-variable">∇J</span> = 𝔼[∇<span class="code-function">μᵢ</span>(oᵢ) · ∇<span class="code-variable">aᵢ</span><span class="code-function">Qᵢ</span>(...)]<br><br>
+                                <span class="code-comment">// Chain rule: how does</span><br>
+                                <span class="code-comment">// changing policy affect Q?</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="comparison-table">
+                    <tr>
+                        <th>Aspect</th>
+                        <th>MADDPG Approach</th>
+                        <th>Benefit</th>
+                    </tr>
+                    <tr>
+                        <td>Action Space</td>
+                        <td><span class="table-tag blue">Continuous</span></td>
+                        <td>Prices, velocities, forces — real-world control</td>
+                    </tr>
+                    <tr>
+                        <td>Cooperation Mode</td>
+                        <td><span class="table-tag purple">Mixed</span></td>
+                        <td>Handles competitive AND cooperative scenarios</td>
+                    </tr>
+                    <tr>
+                        <td>Reward Structure</td>
+                        <td><span class="table-tag cyan">Individual</span></td>
+                        <td>Each agent has own reward function</td>
+                    </tr>
+                    <tr>
+                        <td>Scalability</td>
+                        <td><span class="table-tag emerald">2-10 Agents</span></td>
+                        <td>Moderate scale with separate critics</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 4: QMIX -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">04 — ALGORITHM</div>
+                    <h2 class="section-title">QMIX</h2>
+                    <p class="section-desc">Monotonic Value Decomposition for Cooperative Multi-Agent RL</p>
+                </div>
+
+                <div class="flow-section">
+                    <div class="flow-container">
+                        <div class="flow-step">
+                            <div class="flow-circle blue">Q₁</div>
+                            <div class="flow-label">Agent 1</div>
+                            <div class="flow-sublabel">Local Q-value</div>
+                        </div>
+                        <div class="flow-step">
+                            <div class="flow-circle cyan">Q₂</div>
+                            <div class="flow-label">Agent 2</div>
+                            <div class="flow-sublabel">Local Q-value</div>
+                        </div>
+                        <div class="flow-step">
+                            <div class="flow-circle purple">Qₙ</div>
+                            <div class="flow-label">Agent N</div>
+                            <div class="flow-sublabel">Local Q-value</div>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <div class="flow-circle emerald">⊕</div>
+                            <div class="flow-label">Mixing Network</div>
+                            <div class="flow-sublabel">State-conditioned</div>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <div class="flow-circle orange">Q<sub>tot</sub></div>
+                            <div class="flow-label">Team Value</div>
+                            <div class="flow-sublabel">Joint Q-value</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon emerald">🔑</div>
+                        <h3 class="card-title">Monotonicity Constraint</h3>
+                        <p class="card-text">The critical insight that makes decentralized execution work:</p>
+                        <div class="code-section" style="margin-top: 15px;">
+                            <div class="code-body">
+                                <span class="code-variable">∂Q_tot</span> / <span class="code-variable">∂Qᵢ</span> ≥ 0 &nbsp;&nbsp;∀i<br><br>
+                                <span class="code-comment">// If agent i's local action increases</span><br>
+                                <span class="code-comment">// its Qᵢ, it ALSO increases Q_tot</span><br>
+                                <span class="code-comment">// → Decentralized argmax works!</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon orange">🧠</div>
+                        <h3 class="card-title">Hypernetwork Architecture</h3>
+                        <p class="card-text">Mixing weights are generated dynamically from global state:</p>
+                        <div class="feature-box">
+                            <div class="feature-box-title">MECHANISM</div>
+                            <ul class="feature-list">
+                                <li>Global state s → Hypernetwork → Weights W</li>
+                                <li>Weights constrained ≥ 0 (via absolute value)</li>
+                                <li>Q_tot = W₂ · ReLU(W₁ · [Q₁...Qₙ] + b₁) + b₂</li>
+                                <li>Non-negative weights ensure monotonicity</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="comparison-table" style="margin-top: 40px;">
+                    <tr>
+                        <th>Feature</th>
+                        <th>MADDPG</th>
+                        <th>QMIX</th>
+                    </tr>
+                    <tr>
+                        <td>Action Space</td>
+                        <td><span class="table-tag blue">Continuous</span></td>
+                        <td><span class="table-tag purple">Discrete</span></td>
+                    </tr>
+                    <tr>
+                        <td>Cooperation Mode</td>
+                        <td>Mixed (competitive/cooperative)</td>
+                        <td>Fully cooperative only</td>
+                    </tr>
+                    <tr>
+                        <td>Critic Structure</td>
+                        <td>Separate per agent</td>
+                        <td>Shared mixing network</td>
+                    </tr>
+                    <tr>
+                        <td>Reward Type</td>
+                        <td>Individual rewards rᵢ</td>
+                        <td>Shared team reward r</td>
+                    </tr>
+                    <tr>
+                        <td>Scalability</td>
+                        <td>2-10 agents typical</td>
+                        <td>Tested with 27+ agents</td>
+                    </tr>
+                    <tr>
+                        <td>Value Decomposition</td>
+                        <td>None (joint Q directly)</td>
+                        <td>Monotonic factorization</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 5: Replay Buffer -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">05 — INFRASTRUCTURE</div>
+                    <h2 class="section-title">Replay Buffer</h2>
+                    <p class="section-desc">Breaking correlation for stable multi-agent learning</p>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon blue">💾</div>
+                        <h3 class="card-title">What It Stores</h3>
+                        <p class="card-text">Joint experiences from all agents:</p>
+                        <div class="code-section" style="margin-top: 15px;">
+                            <div class="code-body">
+                                <span class="code-comment">// MADDPG buffer entry:</span><br>
+                                (o_all, a_all, r_all, o'_all, done)<br><br>
+                                <span class="code-comment">// QMIX buffer entry:</span><br>
+                                (s, o_all, a_all, r_team, s', done)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon purple">🎲</div>
+                        <h3 class="card-title">Why Random Sampling</h3>
+                        <p class="card-text">Sequential training causes catastrophic forgetting. Random sampling:</p>
+                        <ul class="feature-list">
+                            <li>Breaks temporal correlation → stable gradients</li>
+                            <li>Approximates IID data → SGD convergence</li>
+                            <li>Averages across policy versions → handles non-stationarity</li>
+                            <li>Enables experience reuse → sample efficiency</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon cyan">⚖️</div>
+                        <h3 class="card-title">Epoch vs Replay</h3>
+                        <div class="feature-box">
+                            <div class="feature-box-title">SUPERVISED LEARNING (EPOCHS)</div>
+                            <ul class="feature-list">
+                                <li>Fixed dataset before training</li>
+                                <li>Every sample seen exactly once per epoch</li>
+                                <li>Systematic coverage guaranteed</li>
+                            </ul>
+                        </div>
+                        <div class="feature-box" style="margin-top: 15px;">
+                            <div class="feature-box-title">RL (REPLAY BUFFER)</div>
+                            <ul class="feature-list">
+                                <li>Data arrives continuously during training</li>
+                                <li>Random sampling — no coverage guarantee</li>
+                                <li>Some samples used 10×, others never</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon emerald">📊</div>
+                        <h3 class="card-title">Typical Configuration</h3>
+                        <div class="feature-box">
+                            <div class="feature-box-title">HYPERPARAMETERS</div>
+                            <ul class="feature-list">
+                                <li>Buffer capacity: 10⁵ - 10⁶ experiences</li>
+                                <li>Batch size: 32 - 256 (commonly 64)</li>
+                                <li>Min buffer before training: 1,000 - 10,000</li>
+                                <li>Update frequency: every 1-4 environment steps</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Learning Path -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">06 — LEARNING PATH</div>
+                    <h2 class="section-title">Step-by-Step Mastery</h2>
+                    <p class="section-desc">Your roadmap from fundamentals to implementation</p>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-step">STEP 01</div>
+                            <h4 class="timeline-title">Master Single-Agent RL Foundations</h4>
+                            <p class="timeline-text">Before multi-agent, ensure solid understanding of: Q-learning, Policy Gradients, Actor-Critic methods, DQN and DDPG architectures, Experience replay mechanics, and Target networks.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-step">STEP 02</div>
+                            <h4 class="timeline-title">Understand Multi-Agent Challenges</h4>
+                            <p class="timeline-text">Study why independent learners fail: non-stationarity, moving target problem, credit assignment, and the curse of dimensionality in joint action spaces.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-step">STEP 03</div>
+                            <h4 class="timeline-title">Learn CTDE Paradigm Deeply</h4>
+                            <p class="timeline-text">Internalize why centralized training with decentralized execution solves the core problems. Understand the information asymmetry between training and deployment.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-step">STEP 04</div>
+                            <h4 class="timeline-title">Implement MADDPG from Scratch</h4>
+                            <p class="timeline-text">Build MADDPG for a simple environment (e.g., multi-agent particle). Focus on: joint replay buffer, centralized critic with all observations, decentralized actors.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-step">STEP 05</div>
+                            <h4 class="timeline-title">Explore QMIX and Value Decomposition</h4>
+                            <p class="timeline-text">Study monotonicity constraint, hypernetworks, and why factorization enables scalability. Implement for StarCraft micromanagement benchmark.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Industry Tools -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">07 — INDUSTRY PRACTICE</div>
+                    <h2 class="section-title">Tool Stack & Best Practices</h2>
+                    <p class="section-desc">Production-ready frameworks and implementation guidance</p>
+                </div>
+
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <div class="tool-category">MARL FRAMEWORKS</div>
+                        <div class="tool-name">Core Libraries</div>
+                        <div class="tool-items">
+                            <span class="tool-item">RLlib (Ray)</span>
+                            <span class="tool-item">PyMARL</span>
+                            <span class="tool-item">EPyMARL</span>
+                            <span class="tool-item">MAPPO</span>
+                            <span class="tool-item">MARLlib</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-category">ENVIRONMENTS</div>
+                        <div class="tool-name">Benchmarks</div>
+                        <div class="tool-items">
+                            <span class="tool-item">SMAC (StarCraft)</span>
+                            <span class="tool-item">MPE (Particle)</span>
+                            <span class="tool-item">PettingZoo</span>
+                            <span class="tool-item">MeltingPot</span>
+                            <span class="tool-item">Hanabi</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-category">DEEP LEARNING</div>
+                        <div class="tool-name">Neural Network Backends</div>
+                        <div class="tool-items">
+                            <span class="tool-item">PyTorch</span>
+                            <span class="tool-item">JAX</span>
+                            <span class="tool-item">TensorFlow</span>
+                            <span class="tool-item">Flax</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-category">EXPERIMENT TRACKING</div>
+                        <div class="tool-name">MLOps Tools</div>
+                        <div class="tool-items">
+                            <span class="tool-item">Weights & Biases</span>
+                            <span class="tool-item">MLflow</span>
+                            <span class="tool-item">TensorBoard</span>
+                            <span class="tool-item">Neptune</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-category">DISTRIBUTED TRAINING</div>
+                        <div class="tool-name">Scale Infrastructure</div>
+                        <div class="tool-items">
+                            <span class="tool-item">Ray Cluster</span>
+                            <span class="tool-item">Kubernetes</span>
+                            <span class="tool-item">Horovod</span>
+                            <span class="tool-item">SLURM</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card">
+                        <div class="tool-category">HYPERPARAMETER TUNING</div>
+                        <div class="tool-name">Optimization</div>
+                        <div class="tool-items">
+                            <span class="tool-item">Ray Tune</span>
+                            <span class="tool-item">Optuna</span>
+                            <span class="tool-item">Hydra</span>
+                            <span class="tool-item">Hyperopt</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cards-grid" style="margin-top: 50px;">
+                    <div class="card">
+                        <div class="card-icon blue">⚙️</div>
+                        <h3 class="card-title">Implementation Best Practices</h3>
+                        <ul class="feature-list">
+                            <li>Start with smaller networks; scale gradually</li>
+                            <li>Use target network soft updates (τ = 0.01)</li>
+                            <li>Normalize observations for stable training</li>
+                            <li>Implement proper action space handling</li>
+                            <li>Monitor per-agent metrics, not just team reward</li>
+                            <li>Use gradient clipping to prevent instability</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon purple">🔍</div>
+                        <h3 class="card-title">Debugging Multi-Agent RL</h3>
+                        <ul class="feature-list">
+                            <li>Verify single-agent baseline works first</li>
+                            <li>Check replay buffer stores joint experiences correctly</li>
+                            <li>Visualize critic Q-values across state space</li>
+                            <li>Plot policy entropy to detect premature convergence</li>
+                            <li>Test with 2 agents before scaling up</li>
+                            <li>Compare against independent learners baseline</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon emerald">📈</div>
+                        <h3 class="card-title">Scaling Considerations</h3>
+                        <ul class="feature-list">
+                            <li>Parameter sharing reduces memory for homogeneous agents</li>
+                            <li>Attention mechanisms help with varying agent counts</li>
+                            <li>Communication protocols for partial observability</li>
+                            <li>Curriculum learning for complex coordination</li>
+                            <li>Prioritized experience replay for sparse rewards</li>
+                            <li>Population-based training for diverse policies</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon orange">🚀</div>
+                        <h3 class="card-title">Production Deployment</h3>
+                        <ul class="feature-list">
+                            <li>Export policies only (critics not needed)</li>
+                            <li>ONNX export for cross-platform deployment</li>
+                            <li>Latency optimization for real-time systems</li>
+                            <li>Graceful degradation when agents fail</li>
+                            <li>A/B testing with conservative rollouts</li>
+                            <li>Monitoring for distribution shift detection</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-number">08 — QUICK REFERENCE</div>
+                    <h2 class="section-title">Decision Guide</h2>
+                    <p class="section-desc">Choose the right algorithm for your problem</p>
+                </div>
+
+                <div class="code-section">
+                    <div class="code-header">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span class="code-title">algorithm_selection.py</span>
+                    </div>
+                    <div class="code-body">
+<span class="code-keyword">def</span> <span class="code-function">select_algorithm</span>(problem):
+    <span class="code-comment"># Step 1: Check cooperation mode</span>
+    <span class="code-keyword">if</span> problem.is_fully_cooperative:
+        <span class="code-comment"># Step 2: Check action space</span>
+        <span class="code-keyword">if</span> problem.action_space == <span class="code-string">"discrete"</span>:
+            <span class="code-keyword">return</span> <span class="code-string">"QMIX"</span>  <span class="code-comment"># Best for cooperative discrete</span>
+        <span class="code-keyword">else</span>:
+            <span class="code-keyword">return</span> <span class="code-string">"MADDPG"</span>  <span class="code-comment"># Handles continuous actions</span>
+    <span class="code-keyword">else</span>:
+        <span class="code-comment"># Mixed or competitive scenarios</span>
+        <span class="code-keyword">return</span> <span class="code-string">"MADDPG"</span>  <span class="code-comment"># Supports any reward structure</span>
+
+<span class="code-comment"># Key hyperparameters</span>
+<span class="code-variable">config</span> = {
+    <span class="code-string">"buffer_size"</span>: <span class="code-number">1_000_000</span>,
+    <span class="code-string">"batch_size"</span>: <span class="code-number">64</span>,
+    <span class="code-string">"learning_rate"</span>: <span class="code-number">3e-4</span>,
+    <span class="code-string">"gamma"</span>: <span class="code-number">0.99</span>,
+    <span class="code-string">"tau"</span>: <span class="code-number">0.01</span>,  <span class="code-comment"># Soft update coefficient</span>
+    <span class="code-string">"hidden_dim"</span>: <span class="code-number">256</span>,
+}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-brand">Multi-Agent RL Infographic</div>
+            <p class="footer-text">Educational material for advanced AI/ML courses • CTDE • MADDPG • QMIX • Replay Buffers</p>
+            <p class="footer-text" style="margin-top: 10px; opacity: 0.6;">Created for classroom instruction and professional development</p>
+        </div>
+    </footer>
+</body>
+</html>
